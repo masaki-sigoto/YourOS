@@ -24,6 +24,7 @@ Claude Code中心の個人向け開発・業務OS。
 ### Readable (優先参照)
 - `AI-readable/`, `Projects/*/Context/`, `Projects/*/Specs/`
 - `SOP/`, `Decisions/`, `Knowledge/`, `Prompts/`
+- `Archive/` -- 読み取り専用。新規書き込み禁止
 
 ### Writable
 - `Inbox/`, `Projects/*/Tasks/`, `Projects/*/Notes/`
@@ -32,7 +33,7 @@ Claude Code中心の個人向け開発・業務OS。
 ### BLOCKED (読み書き禁止)
 - `AI-blocked/` -- 絶対にRead/Write/Editしない
 - `Private/` -- 絶対にRead/Write/Editしない
-- セキュリティフックで自動ブロック
+- セキュリティフック（Day 6で設置予定）で自動ブロック
 
 ## Naming Conventions
 
@@ -61,7 +62,7 @@ Claude Code中心の個人向け開発・業務OS。
 ---
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-type: inbox|spec|task|decision|sop|knowledge|handoff
+type: inbox|spec|task|decision|sop|knowledge|handoff|index|review
 project: project-name
 status: draft|active|done|archived
 tags: [p:xxx, a:xxx]
@@ -70,7 +71,7 @@ tags: [p:xxx, a:xxx]
 
 ## Operating Rules
 
-1. **追記主義**: 上書きしない。変更は `HH:MM` タイムスタンプ付きで追記
+1. **追記主義**: 上書きしない。変更は `HH:MM` タイムスタンプ付きで追記。Decisionsは不変: 既存を編集せず新規作成し `overrides:` で参照
 2. **1トピック1ファイル**: 1つのファイルに1つのトピックだけ
 3. **テンプレ使用**: `_template.md` がある場合はそれに従う
 4. **Inbox入口**: すべての思いつきはまずInboxへ（`/inbox`コマンド）

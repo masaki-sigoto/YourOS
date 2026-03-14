@@ -1,12 +1,16 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-03-14T23:30:26.412Z",
+  "updatedAt": "2026-03-14T23:42:10.486Z",
   "skills": {},
   "commands": {},
   "agents": {
     "claude-code-harness:code-reviewer": {
-      "count": 1,
-      "lastUsed": "2026-03-14T23:30:26.412Z"
+      "count": 3,
+      "lastUsed": "2026-03-14T23:39:44.418Z"
+    },
+    "claude-code-harness:task-worker": {
+      "count": 2,
+      "lastUsed": "2026-03-14T23:42:10.485Z"
     }
   },
   "hooks": {}

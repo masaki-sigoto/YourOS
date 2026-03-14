@@ -1,2 +1,10 @@
 {"event":"subagent_start","timestamp":"2026-03-14T23:28:54Z","agent_id":"unknown"}
 {"event":"subagent_stop","timestamp":"2026-03-14T23:30:26Z","agent_id":"unknown","transcript_path":"","transcript_preview":""}
+{"event":"subagent_start","timestamp":"2026-03-14T23:31:26Z","agent_id":"unknown"}
+{"event":"subagent_stop","timestamp":"2026-03-14T23:32:07Z","agent_id":"unknown","transcript_path":"","transcript_preview":""}
+{"event":"subagent_start","timestamp":"2026-03-14T23:34:23Z","agent_id":"unknown"}
+{"event":"subagent_stop","timestamp":"2026-03-14T23:37:57Z","agent_id":"unknown","transcript_path":"","transcript_preview":""}
+{"event":"subagent_start","timestamp":"2026-03-14T23:38:19Z","agent_id":"unknown"}
+{"event":"subagent_stop","timestamp":"2026-03-14T23:39:44Z","agent_id":"unknown","transcript_path":"","transcript_preview":""}
+{"event":"subagent_start","timestamp":"2026-03-14T23:41:16Z","agent_id":"unknown"}
+{"event":"subagent_stop","timestamp":"2026-03-14T23:42:10Z","agent_id":"unknown","transcript_path":"","transcript_preview":""}

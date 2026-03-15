@@ -37,7 +37,7 @@ context: fork
 
 1. `/Users/apple/YourOS/Projects/<project>/Tasks/` が存在しない場合は `mkdir -p` で作成
 2. タスクファイルを以下のテンプレートで作成
-3. `spec:` が指定された場合、`/Users/apple/YourOS/Projects/<project>/<spec:path>` を Read で確認。ファイルが存在すれば `## Task Breakdown` セクションにこのタスクへのリンクを追記。存在しない場合はバックリンク追記をスキップし「指定された Spec ファイルが見つかりません: (パス)」とユーザーに警告する
+3. `spec:` が指定された場合、`/Users/apple/YourOS/Projects/<project>/<spec:path>` を Read で確認。ファイルが存在すれば `## タスク分解` セクションにこのタスクへのリンクを追記。存在しない場合はバックリンク追記をスキップし「指定された Spec ファイルが見つかりません: (パス)」とユーザーに警告する
 
 ## テンプレート
 
@@ -54,7 +54,7 @@ spec: Specへの相対パス（指定時）
 tags: [p:<project>]
 ---
 
-# Task: タスクタイトル
+# タスク: タスクタイトル
 
 ## 内容
 
@@ -76,3 +76,5 @@ tags: [p:<project>]
 - 作成されたファイルパス
 - 優先度と期限（設定されている場合）
 - 関連Specへのリンク（設定されている場合）
+
+**重要**: すべての出力は日本語で行うこと。

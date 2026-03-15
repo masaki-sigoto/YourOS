@@ -33,17 +33,20 @@ context: fork
 ## 出力フォーマット
 
 ```
-今日の優先タスク Top 3:
+今日の優先タスク:
 
-1. [高] タスクタイトル (p:project-name, due:YYYY-MM-DD)
+1. [高] タスクタイトル (プロジェクト:project-name, 期限:YYYY-MM-DD)
    → /Users/apple/YourOS/Projects/project-name/Tasks/YYYY-MM-DD--slug.md
 
-2. [通常] タスクタイトル (p:project-name)
+2. [通常] タスクタイトル (プロジェクト:project-name)
    → /Users/apple/YourOS/Projects/project-name/Tasks/YYYY-MM-DD--slug.md
 
-3. [低] タスクタイトル (p:project-name, due:YYYY-MM-DD)
+3. [低] タスクタイトル (プロジェクト:project-name, 期限:YYYY-MM-DD)
    → /Users/apple/YourOS/Projects/project-name/Tasks/YYYY-MM-DD--slug.md
 ```
 
 タスクが0件の場合: 「未完了のタスクはありません。`/task` で新しいタスクを作成してください。」
+タスクが3件未満の場合: 存在する分だけ表示する。
+
+**重要**: すべての出力は日本語で行うこと。
 タスクが3件未満の場合: 存在する分だけ表示する。

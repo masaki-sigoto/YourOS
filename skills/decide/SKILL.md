@@ -49,7 +49,7 @@ overrides: ""
 tags: []
 ---
 
-# Decision: タイトル
+# 決定: タイトル
 
 ## 決定事項
 

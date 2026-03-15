@@ -47,45 +47,45 @@ status: active
 tags: [t:review]
 ---
 
-# Weekly Review - YYYY-WXX
+# 週次レビュー - YYYY-WXX
 
 期間: YYYY-MM-DD (月) 〜 YYYY-MM-DD (日)
 
-## Completed（完了したこと）
+## 完了したこと
 
 対象週に status が done に変わったタスクを一覧表示。
-- [done] タスク名 (p:project-name) — 完了日
+- [完了] タスク名 (p:project-name) — 完了日
 
 完了タスクがない場合: 「今週完了したタスクはありませんでした。」
 
-## In Progress（進行中）
+## 進行中
 
 status が active のタスクを一覧表示。
-- [active] タスク名 (p:project-name) — 優先度
+- [進行中] タスク名 (p:project-name) — 優先度
 
-## Inbox Status
+## Inbox の状況
 
 - 未処理アイテム数: N件
 - 今週追加: N件
 
-## Decisions Made（今週の意思決定）
+## 今週の意思決定
 
 対象週に作成された Decision ファイルを一覧表示。
 - 決定タイトル — YYYY-MM-DD
 
-## What Went Well（良かったこと）
+## 良かったこと
 
 収集した情報から推察される、うまくいった点を記述。
 
-## Improve（改善したいこと）
+## 改善したいこと
 
 未完了タスクの傾向、Inbox の滞留、繰り返しパターンから改善点を提案。
 
-## Learnings（学び）
+## 学び
 
 Knowledge/ に追加された新しい知見があれば記載。
 
-## Next Week Goals（来週の目標）
+## 来週の目標
 
 - [ ] 進行中タスクのうち優先度が高いもの Top 3
 - [ ] 未トリアージの Inbox アイテムの処理
@@ -96,3 +96,5 @@ Knowledge/ に追加された新しい知見があれば記載。
 ファイル作成後、以下を通知:
 - 作成されたファイルパス
 - 完了タスク数、進行中タスク数、未処理Inboxアイテム数のサマリー
+
+**重要**: すべての出力は日本語で行うこと。

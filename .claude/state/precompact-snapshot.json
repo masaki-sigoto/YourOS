@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2026-03-14T23:43:31.209Z",
+  "sessionId": "",
+  "wipTasks": [],
+  "recentEdits": [
+    ".claude/logs/subagent-history.jsonl",
+    ".claude/state/harness-usage.json"
+  ],
+  "metrics": null
+}

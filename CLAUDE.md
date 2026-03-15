@@ -33,7 +33,7 @@ Claude Code中心の個人向け開発・業務OS。
 ### BLOCKED (読み書き禁止)
 - `AI-blocked/` -- 絶対にRead/Write/Editしない
 - `Private/` -- 絶対にRead/Write/Editしない
-- セキュリティフック（Day 6で設置予定）で自動ブロック
+- PreToolUse フック（`/Users/apple/.claude/settings.json`）が Write/Edit をブロック
 
 ## Naming Conventions
 

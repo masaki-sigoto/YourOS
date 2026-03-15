@@ -180,6 +180,280 @@ git commit -m "Initialize YourOS"
 |---------|------|--------|
 | `/company` | 秘書窓口で日常運営 | `/company 今日のタスクを確認して` |
 
+## Usage Examples（具体的な使い方）
+
+### シナリオ 1: アイデアが浮かんだ → 記録する
+
+散歩中やミーティング中に「あ、あの機能ほしい」と思ったら、すぐにキャプチャ。
+後から整理すればいいので、この段階では雑でOK。
+
+```
+/inbox ユーザーのプロフィール画像をS3に保存する機能がほしい
+/inbox 来週の打ち合わせでAPI設計の方針を決める
+/inbox Tailwind v4にアップグレードしたい、breaking changesを調べる
+```
+
+生成されるファイル: `Inbox/2026/2026-03-15.md`
+
+```markdown
+## キャプチャ
+
+- **09:32** | ユーザーのプロフィール画像をS3に保存する機能がほしい
+- **10:15** | 来週の打ち合わせでAPI設計の方針を決める
+- **14:03** | Tailwind v4にアップグレードしたい、breaking changesを調べる
+```
+
+---
+
+### シナリオ 2: Inbox を整理する → 適切な場所に昇格
+
+1日の終わりや週初めに、溜まった Inbox を仕分けます。
+Claude が内容に応じて行き先を提案し、対話しながら振り分けます。
+
+```
+/triage today
+```
+
+対話例:
+```
+Claude: 3件の未処理アイテムがあります。
+
+1. "ユーザーのプロフィール画像をS3に保存する機能がほしい"
+   → 提案: Projects に昇格（実装タスク）
+   仕分け先はどうしますか？ [Projects / Knowledge / SOP / Decisions / Skip / Discard]
+
+You: Projects で。プロジェクト名は customer-portal
+
+2. "来週の打ち合わせでAPI設計の方針を決める"
+   → 提案: Skip（まだ具体化していない）
+
+3. "Tailwind v4にアップグレードしたい"
+   → 提案: Knowledge に記録（技術調査メモ）
+```
+
+---
+
+### シナリオ 3: 新機能を設計する → 仕様書を作る
+
+「何を作るか」をぼんやり決めたら、実装に入る前にまず Spec を書きます。
+受入条件（Acceptance Criteria）を定義することで、完了基準が明確になります。
+
+```
+/spec p:customer-portal プロフィール画像アップロード機能
+```
+
+生成されるファイル: `Projects/customer-portal/Specs/2026-03-15--profile-image-upload.md`
+
+```markdown
+# Spec: プロフィール画像アップロード機能
+
+## Background（背景）
+ユーザーがプロフィール画像を設定できる機能が必要。
+
+## Acceptance Criteria（受入条件）
+- [ ] 画像ファイル（JPG/PNG/WebP）をアップロードできる
+- [ ] 5MB以下のファイルサイズ制限がある
+- [ ] アップロード後にプレビューが表示される
+- [ ] S3に保存され、CDN経由で配信される
+
+## Task Breakdown（タスク分解）
+1. S3バケットの設定
+2. アップロードAPIエンドポイント
+3. フロントエンドのアップロードUI
+```
+
+---
+
+### シナリオ 4: 仕様からタスクを切り出す
+
+Spec のタスク分解をもとに、具体的な作業タスクを作ります。
+期限や優先度、Spec へのリンクを指定できます。
+
+```
+/task p:customer-portal S3バケットとIAMポリシーの設定 due:2026-03-18 prio:高 spec:Specs/2026-03-15--profile-image-upload.md
+/task p:customer-portal アップロードAPIの実装 due:2026-03-19 prio:高
+/task p:customer-portal フロントエンドUIの実装 due:2026-03-20 prio:通常
+```
+
+---
+
+### シナリオ 5: 今日なにやる？ → 優先順位を確認
+
+朝の作業開始時に、全プロジェクト横断で「今やるべきこと」を確認。
+
+```
+/next
+```
+
+出力例:
+```
+今日の優先タスク Top 3:
+
+1. [高] S3バケットとIAMポリシーの設定 (p:customer-portal, due:2026-03-18)
+   → Projects/customer-portal/Tasks/2026-03-15--s3-bucket-setup.md
+
+2. [高] アップロードAPIの実装 (p:customer-portal, due:2026-03-19)
+   → Projects/customer-portal/Tasks/2026-03-15--upload-api.md
+
+3. [通常] フロントエンドUIの実装 (p:customer-portal, due:2026-03-20)
+   → Projects/customer-portal/Tasks/2026-03-15--frontend-upload-ui.md
+```
+
+特定のプロジェクトだけ見たいとき:
+```
+/next p:customer-portal
+```
+
+---
+
+### シナリオ 6: 技術選定を記録する → 意思決定ログ
+
+「なぜその技術を選んだか」を後から振り返れるように記録します。
+Decisions は不変（immutable）。覆す場合は新しい Decision を作ります。
+
+```
+/decide 画像ストレージはS3+CloudFrontを使用 why:コスト効率とCDNの低レイテンシ follow:CloudFrontディストリビューションを作成
+```
+
+生成されるファイル: `Decisions/2026/2026-03-15--s3-cloudfront-storage.md`
+
+半年後に「なんで S3 にしたんだっけ？」と聞かれても答えられます。
+
+決定を覆す例:
+```
+/decide 画像ストレージをCloudflare R2に移行 why:S3のエグレス費用が想定以上 follow:R2バケット作成と移行スクリプト
+```
+→ 新しい Decision ファイルが作成され、前の決定と時系列で追える
+
+---
+
+### シナリオ 7: コミット前に品質チェック
+
+実装が終わったら、コミットする前に diff をレビュー。
+セキュリティ問題やバグを自動検出します。
+
+```
+/review-diff
+```
+
+出力例:
+```
+== review-diff ==
+判定: NOGO
+
+### チェック結果
+- [PASS] セキュリティ: ハードコードされたシークレットなし
+- [PASS] エラーハンドリング: 適切に処理されている
+- [FAIL] 型安全性: any が2箇所で使用 (upload.ts:15, 42)
+
+### 推奨アクション
+1. upload.ts:15 の any を具体的な型に置換
+2. upload.ts:42 の any を File | null に変更
+```
+
+Spec と照合してチェックすることもできる:
+```
+/review-diff spec:Projects/customer-portal/Specs/2026-03-15--profile-image-upload.md focus:security
+```
+→ Spec の受入条件を1つずつチェックし、PASS / WARN / FAIL を判定
+
+---
+
+### シナリオ 8: 作業を中断する → 引き継ぎメモ
+
+急な割り込みや退勤時に、現在の状況を記録。
+次回（明日の自分、または別のセッション）がスムーズに再開できます。
+
+```
+/handoff アップロードAPIのエラーハンドリングを実装中
+```
+
+生成されるファイル: `Scratch/Handoffs/2026-03-15--upload-api-error-handling.md`
+
+```markdown
+# Handoff - 2026-03-15
+
+## Where I Stopped（中断箇所）
+アップロードAPIのエラーハンドリングを実装中
+
+## What's Next（次にやること）
+- [ ] （次回セッションで記入）
+
+## Open Questions（未解決の問題）
+- （なし）
+
+## Key Files（関連ファイル）
+- （次回セッションで記入）
+```
+
+次のセッション開始時に `/next` と合わせて見ると、すぐに状況把握できます。
+
+---
+
+### シナリオ 9: 週末に振り返る
+
+金曜日の終わりに、今週やったことを自動集計。
+完了タスク、進行中の作業、学びをまとめます。
+
+```
+/weekly
+```
+
+生成されるファイル: `Archive/Reviews/2026-W11.md`
+
+```markdown
+# Weekly Review - 2026-W11
+期間: 2026-03-10 (月) 〜 2026-03-16 (日)
+
+## Completed（完了したこと）
+- [done] S3バケットとIAMポリシーの設定 (p:customer-portal) — 03-16
+- [done] アップロードAPIの実装 (p:customer-portal) — 03-17
+
+## In Progress（進行中）
+- [active] フロントエンドUIの実装 (p:customer-portal) — 通常
+
+## Decisions Made（今週の意思決定）
+- 画像ストレージはS3+CloudFrontを使用 — 2026-03-15
+
+## Improve（改善したいこと）
+- Inbox に3件が未トリアージのまま残っている
+```
+
+---
+
+### シナリオ 10: 自分のプロンプトの癖を分析する
+
+過去の AI 対話ログを分析し、プロンプティングの改善点を見つけます。
+
+```
+/prompt-review 30
+```
+
+過去30日分の Claude Code / GitHub Copilot / Cline 等のログを収集し分析。
+レポートは `Scratch/Reviews/prompt-review-2026-03-15.md` に出力されます。
+
+分析内容:
+- 技術理解度マップ（熟知 / 基本理解 / 学習中）
+- プロンプティングパターン（効果的なパターン / 改善可能なパターン）
+- AI 依存度（主体的に方針を決めているか、AI に丸投げしているか）
+- 成長の軌跡（時系列でのプロンプト品質の変化）
+
+---
+
+### 日常の流れまとめ
+
+```
+朝:   /next            → 今日やることを確認
+作業中: /inbox 思いついたこと → 割り込みアイデアをキャプチャ
+設計:  /spec p:xxx 説明    → 実装前に仕様化
+実装:  /task p:xxx タスク   → タスクを切って進める
+決定:  /decide 方針 why:理由 → 技術選定を記録
+検証:  /review-diff        → コミット前チェック
+退勤:  /handoff 状況       → 引き継ぎメモ
+金曜:  /weekly             → 週次振り返り
+月末:  /prompt-review 30   → プロンプト品質の分析
+```
+
 ## Workflow（運用フロー）
 
 ### 日常サイクル

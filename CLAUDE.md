@@ -93,16 +93,42 @@ Codex は PM（Claude Code）の上位に位置する最終承認者。
 
 ## Available Commands
 
+### 記録・整理
+
 | Command | Purpose |
 |---------|---------|
-| `/inbox` | 思いつきを即記録 |
-| `/triage` | Inboxの整理・昇格 |
-| `/handoff` | 中断・引き継ぎメモ |
-| `/spec` | 仕様化（受入条件付き） |
-| `/task` | タスク作成・更新 |
-| `/next` | 今日の最優先3つ |
-| `/decide` | 意思決定ログ |
-| `/review-diff` | diffレビュー（GO/NOGO） |
-| `/weekly` | 週次レビュー |
-| `/prompt-review` | プロンプト運用分析 |
+| `/inbox` | 思いつきを即記録（`p:` タグ、`!` 緊急マーク対応） |
+| `/triage` | Inboxの整理・昇格（AI提案、`--auto` 一括モード対応） |
+| `/search` | YourOS横断検索（`in:` フォルダ指定、`since:` 日付指定対応） |
+| `/recall` | トピック別の経緯追跡（Decision チェーン、タイムライン表示） |
+
+### プロジェクト管理
+
+| Command | Purpose |
+|---------|---------|
+| `/spec` | 仕様化（受入条件自動生成、`type:` 種別、`depends:` 依存関係対応） |
+| `/task` | タスク作成（`effort:` 工数、`parent:` サブタスク、重複検出対応） |
+| `/done` | タスク完了（status更新、Spec受入条件の照合） |
+| `/decide` | 意思決定ログ（`domain:` 分類、`p:` プロジェクト紐付け、重複チェック） |
+
+### 日次・週次ワークフロー
+
+| Command | Purpose |
+|---------|---------|
+| `/standup` | 日次スタンドアップ（昨日の完了・今日の予定・ブロッカー自動収集） |
+| `/next` | 朝のブリーフィング（期限超過・Handoff・Inbox統合、表示件数可変） |
+| `/handoff` | 中断・引き継ぎメモ（git状態・変更ファイル・activeタスク自動収集） |
+| `/weekly` | 週次レビュー（git履歴・KPI・前週比較・prompt-review統合） |
+
+### 品質・振り返り
+
+| Command | Purpose |
+|---------|---------|
+| `/review-diff` | diffレビュー（Spec自動検出、結果保存、プロジェクト固有ルール参照） |
+| `/prompt-review` | プロンプト運用分析（品質スコア、前回比較、ツールフィルタ、改善提案） |
+
+### 会社OS
+
+| Command | Purpose |
+|---------|---------|
 | `/company` | 会社OS（秘書窓口） |

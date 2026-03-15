@@ -1,109 +1,883 @@
 # YourOS
 
-Claude Code 中心の個人向け「開発・業務 OS」。
-思いつきを即キャプチャし、仕様化 → 実装 → 検証 → 記憶のサイクルを構造化されたフォルダとスラッシュコマンドで回す。
+**AI と一緒に仕事を回すための「自分専用デスク」です。**
 
-## Overview
+普段の仕事で、こんなことはありませんか？
+
+- アイデアを思いついたけど、どこにメモしたか忘れた
+- 「なんでこの技術にしたんだっけ？」と半年後に思い出せない
+- 作業を中断したら、次の日に何をやっていたか分からなくなった
+- 今日何をやるべきか、優先順位がぐちゃぐちゃ
+
+YourOS は、こうした問題を **10 個のスラッシュコマンド** で解決します。
+Claude Code（AI アシスタント）に `/inbox メモ内容` のように話しかけるだけで、
+情報が自動的に正しい場所に整理されていきます。
+
+---
+
+## YourOS ってなに？
+
+YourOS は、パソコンの中に作る **「自分専用のファイル整理棚」** です。
+
+仕事で使うファイルを 11 個のフォルダに分類し、
+Claude Code（AI）が自動でファイルの作成・整理・振り返りを手伝ってくれます。
+
+**従来のやり方:**
+「あのメモどこだっけ…」→ デスクトップを探す → 見つからない → 諦める
+
+**YourOS のやり方:**
+`/inbox あのアイデア` → 自動で日付付きファイルに記録 → あとで `/triage` で整理
+
+---
+
+## フォルダ構成（ファイルの整理棚）
+
+YourOS をセットアップすると、ホームフォルダ（`~/YourOS/`）に以下のフォルダが作られます。
 
 ```
-YourOS/
-  Inbox/          … すべての入口。思いつきを即記録
-  Projects/       … 進行中プロジェクト（Spec / Tasks / Notes / Context / Links）
-  Knowledge/      … 短く要約された正の情報（dev / biz / tools）
-  SOP/            … 再現可能な手順書（dev / ops / security）
-  Decisions/      … 不変の意思決定ログ
-  Prompts/        … プロンプト雛形・スキル設計
-  Scratch/        … 作業中の一時置き場（Daily / Handoffs / Reviews / Experiments）
-  Archive/        … 完了・陳腐化した退避先（AI 読み取り専用）
-  Private/        … 個人情報・機密（AI アクセス BLOCKED）
-  AI-readable/    … AI 向け整形済み正本・要約
-  AI-blocked/     … 鍵・契約・生データ（AI アクセス BLOCKED）
-  .company/       … cc-company 組織構造（秘書→CEO→部署）
+~/YourOS/
+│
+├── Inbox/          思いつきの受け皿。なんでもここに入れる
+├── Projects/       進行中のプロジェクト（設計書・タスク・メモなど）
+├── Knowledge/      学んだことの記録（技術メモ・ビジネス知識など）
+├── SOP/            手順書（「○○のやり方」をまとめたもの）
+├── Decisions/      「なぜそう決めたか」の記録
+├── Prompts/        よく使うプロンプトの雛形
+├── Scratch/        作業中の一時ファイル・引き継ぎメモ・レビュー
+├── Archive/        終わったものの保管庫（読み取り専用）
+├── Private/        個人情報・機密情報（AIはアクセスできない）
+├── AI-readable/    AIが参照しやすいように整形したファイル
+├── AI-blocked/     APIキーや契約書など（AIはアクセスできない）
+└── .company/       仮想会社の組織構造（cc-companyプラグイン用）
 ```
 
-## Prerequisites
+**ポイント**: `Private/` と `AI-blocked/` は AI が絶対に読み書きできないように保護されています。パスワードや API キーなどの機密情報はここに入れてください。
 
-| 項目 | 要件 |
+---
+
+## スラッシュコマンドとは？
+
+Claude Code のチャット画面で、`/` から始まるコマンドを入力すると、
+決まった処理を自動で実行してくれます。スマホのショートカットのようなものです。
+
+**使い方は簡単:**
+
+1. Claude Code を起動する
+2. チャット画面に `/コマンド名 内容` と入力する
+3. Enter を押す
+4. AI が自動でファイルを作成・更新してくれる
+
+---
+
+## コマンド詳細ガイド
+
+### `/inbox` — なんでもメモ箱
+
+**これは何？**
+思いついたことを、とにかく素早く記録するためのコマンドです。
+ノートの切れ端にメモするような感覚で使います。
+
+**いつ使う？**
+- ふとアイデアが浮かんだとき
+- 「あとでやろう」と思ったことがあるとき
+- ミーティング中に気になったことがあるとき
+- 忘れそうなことを、ひとまず書き留めたいとき
+
+**ポイント**: この段階では、内容が雑でも、日本語でも英語でも、1行でもOKです。
+整理は後でやればいいので、**記録することが最優先** です。
+
+**入力例:**
+
+```
+/inbox ホームページのデザインを変えたい
+```
+
+```
+/inbox 来週の会議でプレゼン資料が必要
+```
+
+```
+/inbox React と Vue どっちがいいか調べる
+```
+
+```
+/inbox 山田さんから聞いたセキュリティの話をまとめる
+```
+
+**何が起きるか:**
+
+`Inbox/2026/2026-03-15.md` というファイルが自動で作られ（または既存ファイルに追記され）、
+以下のように時刻付きで記録されます:
+
+```markdown
+---
+created: 2026-03-15
+type: inbox
+status: active
+---
+
+# Inbox - 2026-03-15
+
+## キャプチャ
+
+- **09:32** | ホームページのデザインを変えたい
+- **10:15** | 来週の会議でプレゼン資料が必要
+- **14:03** | React と Vue どっちがいいか調べる
+- **16:45** | 山田さんから聞いたセキュリティの話をまとめる
+```
+
+1日に何回使っても、同じ日のファイルにどんどん追記されていきます。
+
+---
+
+### `/triage` — メモを整理する
+
+**これは何？**
+`/inbox` で溜めたメモを、正しいフォルダに振り分けるコマンドです。
+机の上に散らかったメモを、引き出しに片付けていくイメージです。
+
+**いつ使う？**
+- 1日の終わりに「今日のメモを整理しよう」と思ったとき
+- 週の初めに「先週の溜まったメモを片付けよう」と思ったとき
+- Inbox がいっぱいになってきたとき
+
+**入力例:**
+
+今日のメモを整理する:
+```
+/triage today
+```
+
+特定の日のメモを整理する:
+```
+/triage 2026-03-10
+```
+
+すべての未整理メモを一括で整理する:
+```
+/triage all
+```
+
+**何が起きるか:**
+
+AI が Inbox の中身を1つずつ読み上げて、「これはどこに入れますか？」と聞いてきます。
+
+```
+Claude: 4件の未処理アイテムがあります。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. "ホームページのデザインを変えたい"
+
+   → 提案: Projects に入れる（プロジェクトのタスクになりそう）
+
+   どこに入れますか？
+   - Projects（プロジェクトのタスクとして管理）
+   - Knowledge（知識として記録）
+   - SOP（手順書として記録）
+   - Decisions（決定事項として記録）
+   - Prompts（プロンプト雛形として保存）
+   - Skip（今はまだ整理しない、Inbox に残す）
+   - Discard（いらない、破棄する）
+
+あなた: Projects で。プロジェクト名は homepage-renewal
+
+Claude: Projects/homepage-renewal/Tasks/ に作成しました。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. "React と Vue どっちがいいか調べる"
+
+   → 提案: Knowledge に入れる（技術調査メモ）
+
+あなた: まだ調べてないから Skip で
+
+Claude: Inbox に残しました。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+トリアージ完了:
+- Projects に昇格: 2件
+- Knowledge に記録: 1件
+- Skip (Inbox残留): 1件
+```
+
+整理が終わったメモには取り消し線が引かれるので、同じメモを二度整理することはありません。
+
+---
+
+### `/spec` — 設計書を作る
+
+**これは何？**
+「何を作るか」を文書にまとめるコマンドです。
+いきなりコードを書き始める前に、**ゴール（完了条件）を決めておく** ための設計書を作ります。
+
+**いつ使う？**
+- 新しい機能を作り始める前
+- 「これって何がOKなら完成？」が曖昧なとき
+- チームで認識を合わせたいとき
+
+**なぜ必要？**
+設計書なしでコードを書き始めると、途中で「あれ、結局何が必要なんだっけ？」となりがちです。
+先に「こうなったら完成」というチェックリスト（受入条件）を書いておくと、
+ゴールがブレなくなります。
+
+**入力例:**
+
+```
+/spec p:homepage-renewal トップページのリニューアル
+```
+
+`p:homepage-renewal` の部分は **プロジェクト名** です。
+関連するファイルを1つのプロジェクトフォルダにまとめるために必要です。
+
+**何が起きるか:**
+
+`Projects/homepage-renewal/Specs/2026-03-15--top-page-renewal.md` が作られます:
+
+```markdown
+# Spec: トップページのリニューアル
+
+## Background（背景）
+なぜこの変更が必要か。現状の問題点。
+
+## Purpose（目的）
+この変更で何を達成したいか。
+
+## Non-goals（今回やらないこと）
+- 今回のスコープ外のことを明示
+
+## Acceptance Criteria（受入条件）
+- [ ] ファーストビューに新しいヒーロー画像が表示される
+- [ ] モバイルでもレイアウトが崩れない
+- [ ] ページ読み込みが3秒以内
+- [ ] 既存のナビゲーションリンクが正しく動作する
+
+## Task Breakdown（タスク分解）
+1. デザインカンプの作成
+2. HTML/CSSの実装
+3. レスポンシブ対応
+4. パフォーマンステスト
+```
+
+「Acceptance Criteria（受入条件）」のチェックリストが重要です。
+ここに書いた条件がすべて満たされたら、その機能は「完成」です。
+
+**プロジェクトフォルダが自動で作られます:**
+
+初めてのプロジェクト名を指定すると、以下のフォルダが自動で作成されます:
+
+```
+Projects/homepage-renewal/
+  ├── Context/   … 背景情報・参考資料
+  ├── Specs/     … 設計書（今作ったファイルはここ）
+  ├── Tasks/     … タスク一覧
+  ├── Notes/     … メモ
+  └── Links/     … 参考URL
+```
+
+---
+
+### `/task` — やることリストに追加する
+
+**これは何？**
+具体的な作業項目を、プロジェクトのタスクとして登録するコマンドです。
+ToDo リストに項目を追加するイメージです。
+
+**いつ使う？**
+- `/spec` で設計書を書いた後に、作業を細分化するとき
+- 「あ、これもやらなきゃ」と気づいたとき
+- 他の人から依頼された作業を記録するとき
+
+**入力例:**
+
+シンプルにタスクだけ追加:
+```
+/task p:homepage-renewal ヒーロー画像のデザインを作成
+```
+
+期限をつける（`due:` の後に日付）:
+```
+/task p:homepage-renewal HTMLコーディング due:2026-03-20
+```
+
+優先度をつける（`prio:` の後に 高/通常/低）:
+```
+/task p:homepage-renewal レスポンシブ対応 due:2026-03-22 prio:高
+```
+
+設計書と紐づける（`spec:` の後に設計書のパス）:
+```
+/task p:homepage-renewal パフォーマンステスト spec:Specs/2026-03-15--top-page-renewal.md
+```
+
+**何が起きるか:**
+
+`Projects/homepage-renewal/Tasks/2026-03-15--hero-image-design.md` が作られます:
+
+```markdown
+---
+type: task
+project: homepage-renewal
+status: active
+priority: 通常
+due: 2026-03-20
+---
+
+# Task: ヒーロー画像のデザインを作成
+
+## 内容
+ヒーロー画像のデザインを作成する。
+
+## 完了条件
+- [ ] 条件1
+- [ ] 条件2
+
+## メモ
+（作業中のメモをここに追記）
+```
+
+---
+
+### `/next` — 今日やることを確認する
+
+**これは何？**
+登録したタスクの中から、**今やるべき最優先のもの 3 つ** を教えてくれるコマンドです。
+朝の作業開始時に「今日は何から手をつけよう？」と迷ったときに使います。
+
+**いつ使う？**
+- 朝、仕事を始めるとき
+- タスクが多くて何から手をつけていいか分からないとき
+- 「あれ、今日期限のタスクあったっけ？」と確認したいとき
+
+**入力例:**
+
+全プロジェクト横断で確認:
+```
+/next
+```
+
+特定のプロジェクトだけ確認:
+```
+/next p:homepage-renewal
+```
+
+**何が起きるか:**
+
+全プロジェクトの未完了タスクを自動でスキャンし、
+優先度（高→通常→低）と期限（近い順）で並べ替えて表示します:
+
+```
+今日の優先タスク Top 3:
+
+1. [高] レスポンシブ対応 (p:homepage-renewal, due:2026-03-22)
+   → Projects/homepage-renewal/Tasks/2026-03-15--responsive.md
+
+2. [通常] HTMLコーディング (p:homepage-renewal, due:2026-03-20)
+   → Projects/homepage-renewal/Tasks/2026-03-15--html-coding.md
+
+3. [通常] ヒーロー画像のデザイン作成 (p:homepage-renewal)
+   → Projects/homepage-renewal/Tasks/2026-03-15--hero-image-design.md
+```
+
+タスクがないときは「未完了のタスクはありません」と教えてくれます。
+
+---
+
+### `/decide` — 決めたことを記録する
+
+**これは何？**
+仕事で「こうすることに決めた」という判断を、**理由つきで記録** するコマンドです。
+
+**いつ使う？**
+- 技術選定をしたとき（「React にしよう」「このライブラリを使おう」）
+- 方針を決めたとき（「毎週金曜にリリースする」）
+- 何かをやめることにしたとき（「この機能は作らない」）
+
+**なぜ必要？**
+決定の記録がないと、半年後に「なんでこうなってるの？」と聞かれたとき困ります。
+自分自身も「あれ、なんでこの技術にしたんだっけ…」と忘れます。
+決定ログがあれば、いつでも理由を振り返れます。
+
+**入力例:**
+
+シンプルに決定を記録:
+```
+/decide フレームワークはNext.jsを採用する
+```
+
+理由もつける（`why:` の後に理由）:
+```
+/decide フレームワークはNext.jsを採用する why:SSRが必要で、Vercelとの相性が良いため
+```
+
+フォローアップ（次にやること）もつける（`follow:` の後に内容）:
+```
+/decide フレームワークはNext.jsを採用する why:SSRが必要 follow:プロジェクトの初期セットアップ
+```
+
+**何が起きるか:**
+
+`Decisions/2026/2026-03-15--adopt-nextjs.md` が作られます:
+
+```markdown
+---
+type: decision
+status: decided
+overrides: ""
+---
+
+# Decision: フレームワークはNext.jsを採用する
+
+## 決定事項
+フレームワークはNext.jsを採用する。
+
+## 理由
+SSRが必要で、Vercelとの相性が良いため。
+
+## 代替案
+- （検討した代替案があれば記載）
+
+## フォローアップ
+- [ ] プロジェクトの初期セットアップ
+```
+
+**大事なルール: Decision は書き換えない**
+
+一度記録した Decision は編集しません（不変 = immutable）。
+もし決定を覆す場合は、**新しい Decision を作ります**:
+
+```
+/decide フレームワークをRemixに変更 why:Next.jsのApp Routerが不安定だったため
+```
+
+こうすると、過去の決定と新しい決定が時系列で残り、
+「最初は Next.js → 途中で Remix に変えた」という経緯が追えます。
+
+---
+
+### `/review-diff` — コードの提出前チェック
+
+**これは何？**
+コードを Git にコミット（保存）する前に、
+**問題がないか AI にチェックしてもらう** コマンドです。
+提出前の最終確認のようなものです。
+
+**いつ使う？**
+- コードを書き終わって「これでOKかな？」と思ったとき
+- コミットする直前
+- セキュリティに問題がないか心配なとき
+
+**入力例:**
+
+基本的なチェック:
+```
+/review-diff
+```
+
+セキュリティを重点的にチェック:
+```
+/review-diff focus:security
+```
+
+設計書の受入条件と照合してチェック:
+```
+/review-diff spec:Projects/homepage-renewal/Specs/2026-03-15--top-page-renewal.md
+```
+
+両方指定:
+```
+/review-diff focus:security spec:Projects/homepage-renewal/Specs/2026-03-15--top-page-renewal.md
+```
+
+**何が起きるか:**
+
+Git の差分（変更内容）を自動で読み取り、以下の観点でチェックします:
+
+- **セキュリティ**: パスワードやAPIキーがコードに直書きされていないか
+- **エラー処理**: エラーが起きたときに適切に対処しているか
+- **型の安全性**: TypeScript で `any` を使いすぎていないか
+- **不要なコード**: 使われていないコードが残っていないか
+
+チェック結果は **GO（問題なし）** または **NOGO（問題あり）** で判定されます:
+
+```
+== review-diff ==
+
+判定: GO
+
+### チェック結果
+- [PASS] セキュリティ: ハードコードされたシークレットなし
+- [PASS] エラーハンドリング: 適切に処理されている
+- [PASS] 型安全性: 問題なし
+- [WARN] 命名規則: 変数名 `d` が不明瞭 (style.css:42)
+
+### 推奨アクション
+1. style.css:42 の変数名をもう少し分かりやすくする（任意）
+
+判定根拠: FAIL が0件 → GO
+```
+
+**NOGO** の場合は、指摘された問題を修正してから再度チェックします。
+
+設計書（Spec）を指定した場合は、受入条件を1つずつ照合します:
+
+```
+### Spec 受入条件
+- [PASS] ファーストビューに新しいヒーロー画像が表示される
+- [PASS] モバイルでもレイアウトが崩れない
+- [WARN] ページ読み込みが3秒以内 → パフォーマンステスト未実施
+- [PASS] 既存のナビゲーションリンクが正しく動作する
+```
+
+---
+
+### `/handoff` — 作業の引き継ぎメモ
+
+**これは何？**
+作業を途中で中断するとき、**今どこまでやったか・次に何をするか** をメモするコマンドです。
+「明日の自分」への置き手紙のようなものです。
+
+**いつ使う？**
+- 仕事を切り上げて帰るとき
+- 急な割り込み作業が入って、今の作業を中断するとき
+- 長い作業の途中で区切りをつけたいとき
+
+**なぜ必要？**
+人間は驚くほど「昨日やっていたこと」を忘れます。
+特にコードの実装中は、頭の中に多くの文脈を抱えているので、
+中断するとその文脈が全部消えます。引き継ぎメモがあれば、翌日スムーズに再開できます。
+
+**入力例:**
+
+```
+/handoff トップページのCSS実装中、レスポンシブ対応がまだ
+```
+
+引数なしでも使える（後から埋める前提）:
+```
+/handoff
+```
+
+**何が起きるか:**
+
+`Scratch/Handoffs/2026-03-15--top-page-css.md` が作られます:
+
+```markdown
+# Handoff - 2026-03-15
+
+## Where I Stopped（中断箇所）
+トップページのCSS実装中、レスポンシブ対応がまだ
+
+## What's Next（次にやること）
+- [ ] （次回セッションで記入）
+
+## Open Questions（未解決の問題）
+- （なし、または次回セッションで記入）
+
+## Key Files（関連ファイル）
+- （次回セッションで記入）
+```
+
+翌日の作業開始時は:
+
+```
+/next       ← 今日の優先タスクを確認
+```
+
+と組み合わせると、すぐに状況を把握できます。
+
+---
+
+### `/weekly` — 今週の振り返り
+
+**これは何？**
+過去7日間にやったことを **自動で集計してレビュー** するコマンドです。
+日記を書くのが面倒な人でも、これなら自動で週報ができます。
+
+**いつ使う？**
+- 金曜日の夕方（今週の振り返り）
+- 月曜日の朝（先週の振り返り + 今週の計画）
+- 「最近何してたっけ…」と思ったとき
+
+**入力例:**
+
+今週の振り返り:
+```
+/weekly
+```
+
+特定の週の振り返り:
+```
+/weekly 2026-W10
+```
+
+**何が起きるか:**
+
+YourOS 内のファイルを自動スキャンし、以下の情報を集計します:
+
+- 完了したタスク（`status: done` のタスク）
+- 進行中のタスク（`status: active` のタスク）
+- Inbox に追加されたメモの数
+- 今週記録した意思決定
+- 作成した設計書
+
+`Archive/Reviews/2026-W11.md` というレビューファイルが作られます:
+
+```markdown
+# Weekly Review - 2026-W11
+期間: 2026-03-10 (月) 〜 2026-03-16 (日)
+
+## Completed（今週完了したこと）
+- [done] ヒーロー画像のデザイン作成 (p:homepage-renewal) — 03-12
+- [done] HTMLコーディング (p:homepage-renewal) — 03-14
+
+## In Progress（まだ終わっていないこと）
+- [active] レスポンシブ対応 (p:homepage-renewal) — 優先度:高
+
+## Inbox Status
+- 未処理アイテム数: 2件
+- 今週追加: 5件
+
+## Decisions Made（今週の決定事項）
+- フレームワークはNext.jsを採用する — 2026-03-15
+
+## What Went Well（良かったこと）
+- デザインからコーディングまでスムーズに進んだ
+
+## Improve（改善したいこと）
+- Inbox に2件が未トリアージのまま残っている
+
+## Next Week Goals（来週の目標）
+- [ ] レスポンシブ対応を完了する
+- [ ] 未トリアージの Inbox アイテムを処理する
+```
+
+---
+
+### `/prompt-review` — AI との対話を振り返る
+
+**これは何？**
+過去の AI との対話ログを分析し、**自分のプロンプトの癖や成長** をレポートにするコマンドです。
+
+**いつ使う？**
+- 「自分のプロンプトの書き方、上手くなってるかな？」と思ったとき
+- AI に頼りすぎていないか確認したいとき
+- 月末の振り返り
+
+**入力例:**
+
+過去7日分を分析:
+```
+/prompt-review 7
+```
+
+過去30日分を分析:
+```
+/prompt-review 30
+```
+
+特定のプロジェクトだけ分析:
+```
+/prompt-review homepage-renewal 14
+```
+
+**何が起きるか:**
+
+Claude Code、GitHub Copilot、Cline などの対話ログを自動で収集・分析し、
+`Scratch/Reviews/prompt-review-2026-03-15.md` にレポートが出力されます。
+
+レポートの内容:
+
+- **技術理解度マップ**: 自分が「熟知している技術」「基本は分かる技術」「まだ学習中の技術」を可視化
+- **プロンプトの書き方の分析**: 効果的な指示の出し方ができているか、曖昧な指示になっていないか
+- **AI 依存度**: 自分で方針を決めて AI に実装を任せているか、それとも方針決定まで AI 任せか
+- **成長の軌跡**: 時間の経過とともにプロンプトの質がどう変化したか
+- **シークレット警告**: ログ内に API キーなどの機密情報が含まれていた場合の警告
+
+---
+
+### `/company` — 秘書に相談する
+
+**これは何？**
+cc-company プラグインで作られた **仮想会社の秘書** に話しかけるコマンドです。
+秘書がユーザーの相談を受け付け、適切な部署（CEO、エンジニアリング、リサーチなど）に振り分けます。
+
+**いつ使う？**
+- 日々の相談ごとがあるとき
+- TODO の確認・更新をしたいとき
+- 「何を誰に頼めばいいか分からない」とき
+
+**入力例:**
+
+```
+/company 今日のタスクを確認して
+```
+
+```
+/company 新しいプロジェクトのアイデアを相談したい
+```
+
+```
+/company 技術選定で迷っている、壁打ちしたい
+```
+
+秘書を通じて cc-company の各部署が連携し、
+結果は `.company/` と `~/YourOS/` の両方に記録されます（dual-write）。
+
+---
+
+## 1日の使い方の例
+
+ある開発者の1日を追ってみましょう:
+
+### 朝（9:00）— 今日のタスク確認
+
+```
+/next
+```
+→ 「今日は3つのタスクがあるな。まずレスポンシブ対応から始めよう」
+
+### 午前中（10:30）— 作業中にアイデアが浮かぶ
+
+```
+/inbox ダークモード対応もいずれやりたい
+```
+→ 今の作業は中断せず、アイデアだけ記録。あとで整理する。
+
+### お昼前（11:45）— 技術的な決断をする
+
+```
+/decide CSSフレームワークはTailwindを使う why:ユーティリティファーストで開発速度が上がるため
+```
+→ なぜ Tailwind にしたか、後から振り返れるように記録。
+
+### 午後（15:00）— コードが書けた、チェックする
+
+```
+/review-diff
+```
+→ 「GO」が出たのでコミットする。
+
+### 夕方（17:30）— 作業を切り上げる
+
+```
+/handoff タブレット用のブレイクポイント調整が残っている
+```
+→ 明日の自分への置き手紙を残す。
+
+### 金曜日（17:00）— 週末の振り返り
+
+```
+/weekly
+/prompt-review 7
+```
+→ 今週の成果と、自分のプロンプトの使い方を振り返る。
+
+### 週末/翌週初め — 溜まったメモの整理
+
+```
+/triage all
+```
+→ Inbox に溜まったメモを、プロジェクト・ナレッジ・手順書に振り分ける。
+
+---
+
+## セットアップ手順
+
+### 必要なもの
+
+| 項目 | 説明 |
 |------|------|
-| Claude Code | v1.0 以上（CLI） |
-| cc-company | プラグインインストール済み |
-| Python | 3.10+（`/prompt-review` の collect.py で使用） |
-| Git | 2.x |
-| OS | macOS / Linux |
+| Claude Code | Anthropic の AI アシスタント（CLI版）。v1.0 以上 |
+| cc-company | Claude Code のプラグイン。仮想会社機能を追加 |
+| Python 3.10+ | `/prompt-review` コマンドで使用 |
+| Git | バージョン管理ツール。2.x |
+| macOS または Linux | 対応OS |
 
-## Setup（セットアップ手順）
+### 手順 1: YourOS をダウンロード
 
-### 1. リポジトリのクローン
+ターミナル（macOS の場合はアプリケーション > ユーティリティ > ターミナル）を開いて、以下を実行:
 
 ```bash
 cd ~
 git clone https://github.com/masaki-sigoto/YourOS.git
 ```
 
-### 2. スキルのインストール
+これで `~/YourOS/` フォルダが作られます。
 
-YourOS は 10 個のスラッシュコマンド（Claude Code Skills）で操作します。
-各コマンドは `~/.claude/skills/<name>/SKILL.md` に定義します。
+### 手順 2: スキル（コマンド定義）をコピー
+
+YourOS のコマンドは、Claude Code の「スキル」として定義されています。
+ダウンロードしたスキルファイルを、Claude Code が読み込める場所にコピーします:
 
 ```bash
-mkdir -p ~/.claude/skills/{inbox,triage,handoff,spec,task,next,decide,review-diff,weekly,prompt-review}
+cp -r ~/YourOS/skills/* ~/.claude/skills/
 ```
 
-各スキルの SKILL.md は [skills/](skills/) ディレクトリに収録しています（参考用）。
-`~/.claude/skills/` にコピーしてください。
-
-> **重要**: SKILL.md 内のパスは `/Users/apple/YourOS/` がハードコードされています。
-> 自分の環境に合わせて一括置換してください:
->
+> `~/.claude/skills/` フォルダがない場合は、先に作成してください:
 > ```bash
-> # macOS
-> find ~/.claude/skills/ -name "SKILL.md" -exec sed -i '' "s|/Users/apple|${HOME}|g" {} +
-> sed -i '' "s|/Users/apple|${HOME}|g" ~/YourOS/CLAUDE.md
->
-> # Linux
-> find ~/.claude/skills/ -name "SKILL.md" -exec sed -i "s|/Users/apple|${HOME}|g" {} +
-> sed -i "s|/Users/apple|${HOME}|g" ~/YourOS/CLAUDE.md
+> mkdir -p ~/.claude/skills
 > ```
 
-### 3. cc-company のセットアップ
+### 手順 3: パスを自分の環境に合わせる
 
-YourOS ディレクトリで cc-company をオンボーディングします。
+スキルファイル内のパスが作者の環境（`/Users/apple`）になっているので、
+自分のユーザー名に書き換えます:
+
+**macOS の場合:**
+```bash
+find ~/.claude/skills/ -name "SKILL.md" -exec sed -i '' "s|/Users/apple|${HOME}|g" {} +
+sed -i '' "s|/Users/apple|${HOME}|g" ~/YourOS/CLAUDE.md
+```
+
+**Linux の場合:**
+```bash
+find ~/.claude/skills/ -name "SKILL.md" -exec sed -i "s|/Users/apple|${HOME}|g" {} +
+sed -i "s|/Users/apple|${HOME}|g" ~/YourOS/CLAUDE.md
+```
+
+### 手順 4: cc-company をセットアップ
+
+Claude Code を起動し、YourOS フォルダに移動してから `/company` を実行:
 
 ```bash
 cd ~/YourOS
-# Claude Code セッション内で:
-# /company
+claude   # Claude Code を起動
 ```
 
-初回オンボーディングで `.company/` ディレクトリが生成されます。
-生成後、`.company/CLAUDE.md` に **YourOS Storage Integration** セクションを追加し、
-秘書の Inbox → `~/YourOS/Inbox/` への dual-write ルールを設定します。
+Claude Code のチャット画面で:
+```
+/company
+```
 
-dual-write の例（`.company/CLAUDE.md` に追記）:
+初回は対話式のセットアップが始まります。質問に答えていくと `.company/` フォルダが自動で作られます。
+
+セットアップ後、`.company/CLAUDE.md` の末尾に以下を追記してください（AI がYourOS と連携するための設定）:
 
 ```markdown
 ## YourOS Storage Integration
 
 Secretary が受け取った inbox アイテムは、以下にも書き込む:
-- `~/YourOS/Inbox/YYYY/YYYY-MM-DD.md`
+- ~/YourOS/Inbox/YYYY/YYYY-MM-DD.md
 
 CEO の意思決定は、以下にも記録する:
-- `~/YourOS/Decisions/YYYY/YYYY-MM-DD--slug.md`
+- ~/YourOS/Decisions/YYYY/YYYY-MM-DD--slug.md
 ```
 
-### 4. セキュリティフックの設定
+### 手順 5: セキュリティフックの設定
 
-AI が `Private/` や `AI-blocked/` に書き込むことを防ぐ PreToolUse フックを設定します。
+AI が `Private/` や `AI-blocked/` フォルダに書き込めないようにする安全装置を設定します。
 
-#### 4-1. フックスクリプトに実行権限を付与
+**5-1. スクリプトに実行権限を付与:**
 
 ```bash
 chmod +x ~/YourOS/SOP/security/block-ai-write.sh
 ```
 
-#### 4-2. `~/.claude/settings.json` にフックを追加
+**5-2. Claude Code の設定ファイルにフック（安全装置）を追加:**
 
-既存の `settings.json` に以下のセクションをマージしてください:
+`~/.claude/settings.json` を開いて、以下の内容を追加してください:
 
 ```json
 {
@@ -114,7 +888,7 @@ chmod +x ~/YourOS/SOP/security/block-ai-write.sh
         "hooks": [
           {
             "type": "command",
-            "command": "/absolute/path/to/YourOS/SOP/security/block-ai-write.sh",
+            "command": "/あなたのホームディレクトリ/YourOS/SOP/security/block-ai-write.sh",
             "timeout": 5
           }
         ]
@@ -124,515 +898,156 @@ chmod +x ~/YourOS/SOP/security/block-ai-write.sh
 }
 ```
 
-> `command` の値を自分の環境の絶対パスに置き換えてください。
-> 例: `/Users/yourname/YourOS/SOP/security/block-ai-write.sh`
+> `command` の `/あなたのホームディレクトリ/` を実際のパスに置き換えてください。
+>
+> 自分のホームディレクトリのパスがわからない場合は、ターミナルで `echo $HOME` と入力すると表示されます。
+> 例: `/Users/tanaka/YourOS/SOP/security/block-ai-write.sh`
 
-#### 4-3. 動作確認
+**5-3. 動作確認:**
 
-Claude Code セッション内で:
+Claude Code で以下を試して、正しくブロックされるか確認:
 
-- `AI-blocked/` への Write → ブロックされること
-- `Private/` への Write → ブロックされること
-- `Inbox/` への Write → 許可されること
+- `AI-blocked/` に何か書こうとする → ブロックされる（正常）
+- `Private/` に何か書こうとする → ブロックされる（正常）
+- `Inbox/` に何か書こうとする → 書き込める（正常）
 
-### 5. Git の初期化（クローンでなく新規構築する場合）
+### 手順 6: 動作確認
 
-```bash
-cd ~/YourOS
-git init
-echo "Private/" >> .gitignore
-echo "AI-blocked/" >> .gitignore
-echo ".DS_Store" >> .gitignore
-git add .
-git commit -m "Initialize YourOS"
-```
-
-## Skills（スキル一覧）
-
-### 入口系
-
-| コマンド | 説明 | 使い方 |
-|---------|------|--------|
-| `/inbox` | 思いつきを即記録 | `/inbox APIレート制限の設計を検討` |
-| `/triage` | Inbox の仕分け・昇格 | `/triage today` or `/triage all` |
-| `/handoff` | 中断時の引き継ぎメモ | `/handoff 認証実装途中` |
-
-### 開発フロー系
-
-| コマンド | 説明 | 使い方 |
-|---------|------|--------|
-| `/spec` | 仕様書の作成（受入条件付き） | `/spec p:my-project ログイン画面のリデザイン` |
-| `/task` | タスクの作成（Spec 連携） | `/task p:my-project バリデーション実装 due:2026-03-20 prio:高` |
-| `/next` | 今日の優先タスク Top 3 | `/next` or `/next p:my-project` |
-| `/decide` | 意思決定の記録（不変） | `/decide TypeScriptに統一 why:型安全性 follow:移行計画作成` |
-
-### 品質ゲート系
-
-| コマンド | 説明 | 使い方 |
-|---------|------|--------|
-| `/review-diff` | コミット前の diff レビュー（GO/NOGO） | `/review-diff focus:security spec:Specs/xxx.md` |
-| `/weekly` | 週次レビュー生成 | `/weekly` or `/weekly 2026-W11` |
-| `/prompt-review` | AI 対話ログの分析レポート | `/prompt-review 7` or `/prompt-review 30` |
-
-### cc-company 統合
-
-| コマンド | 説明 | 使い方 |
-|---------|------|--------|
-| `/company` | 秘書窓口で日常運営 | `/company 今日のタスクを確認して` |
-
-## Usage Examples（具体的な使い方）
-
-### シナリオ 1: アイデアが浮かんだ → 記録する
-
-散歩中やミーティング中に「あ、あの機能ほしい」と思ったら、すぐにキャプチャ。
-後から整理すればいいので、この段階では雑でOK。
+すべてのセットアップが終わったら、Claude Code で以下のコマンドを試してみてください:
 
 ```
-/inbox ユーザーのプロフィール画像をS3に保存する機能がほしい
-/inbox 来週の打ち合わせでAPI設計の方針を決める
-/inbox Tailwind v4にアップグレードしたい、breaking changesを調べる
+/inbox テスト: セットアップ確認
 ```
-
-生成されるファイル: `Inbox/2026/2026-03-15.md`
-
-```markdown
-## キャプチャ
-
-- **09:32** | ユーザーのプロフィール画像をS3に保存する機能がほしい
-- **10:15** | 来週の打ち合わせでAPI設計の方針を決める
-- **14:03** | Tailwind v4にアップグレードしたい、breaking changesを調べる
-```
-
----
-
-### シナリオ 2: Inbox を整理する → 適切な場所に昇格
-
-1日の終わりや週初めに、溜まった Inbox を仕分けます。
-Claude が内容に応じて行き先を提案し、対話しながら振り分けます。
-
-```
-/triage today
-```
-
-対話例:
-```
-Claude: 3件の未処理アイテムがあります。
-
-1. "ユーザーのプロフィール画像をS3に保存する機能がほしい"
-   → 提案: Projects に昇格（実装タスク）
-   仕分け先はどうしますか？ [Projects / Knowledge / SOP / Decisions / Skip / Discard]
-
-You: Projects で。プロジェクト名は customer-portal
-
-2. "来週の打ち合わせでAPI設計の方針を決める"
-   → 提案: Skip（まだ具体化していない）
-
-3. "Tailwind v4にアップグレードしたい"
-   → 提案: Knowledge に記録（技術調査メモ）
-```
-
----
-
-### シナリオ 3: 新機能を設計する → 仕様書を作る
-
-「何を作るか」をぼんやり決めたら、実装に入る前にまず Spec を書きます。
-受入条件（Acceptance Criteria）を定義することで、完了基準が明確になります。
-
-```
-/spec p:customer-portal プロフィール画像アップロード機能
-```
-
-生成されるファイル: `Projects/customer-portal/Specs/2026-03-15--profile-image-upload.md`
-
-```markdown
-# Spec: プロフィール画像アップロード機能
-
-## Background（背景）
-ユーザーがプロフィール画像を設定できる機能が必要。
-
-## Acceptance Criteria（受入条件）
-- [ ] 画像ファイル（JPG/PNG/WebP）をアップロードできる
-- [ ] 5MB以下のファイルサイズ制限がある
-- [ ] アップロード後にプレビューが表示される
-- [ ] S3に保存され、CDN経由で配信される
-
-## Task Breakdown（タスク分解）
-1. S3バケットの設定
-2. アップロードAPIエンドポイント
-3. フロントエンドのアップロードUI
-```
-
----
-
-### シナリオ 4: 仕様からタスクを切り出す
-
-Spec のタスク分解をもとに、具体的な作業タスクを作ります。
-期限や優先度、Spec へのリンクを指定できます。
-
-```
-/task p:customer-portal S3バケットとIAMポリシーの設定 due:2026-03-18 prio:高 spec:Specs/2026-03-15--profile-image-upload.md
-/task p:customer-portal アップロードAPIの実装 due:2026-03-19 prio:高
-/task p:customer-portal フロントエンドUIの実装 due:2026-03-20 prio:通常
-```
-
----
-
-### シナリオ 5: 今日なにやる？ → 優先順位を確認
-
-朝の作業開始時に、全プロジェクト横断で「今やるべきこと」を確認。
+→ `Inbox/` にファイルが作られたら成功です。
 
 ```
 /next
 ```
+→ 「未完了のタスクはありません」と表示されたら成功です。
 
-出力例:
 ```
-今日の優先タスク Top 3:
-
-1. [高] S3バケットとIAMポリシーの設定 (p:customer-portal, due:2026-03-18)
-   → Projects/customer-portal/Tasks/2026-03-15--s3-bucket-setup.md
-
-2. [高] アップロードAPIの実装 (p:customer-portal, due:2026-03-19)
-   → Projects/customer-portal/Tasks/2026-03-15--upload-api.md
-
-3. [通常] フロントエンドUIの実装 (p:customer-portal, due:2026-03-20)
-   → Projects/customer-portal/Tasks/2026-03-15--frontend-upload-ui.md
+/decide YourOSのセットアップ完了 why:動作確認のため
 ```
-
-特定のプロジェクトだけ見たいとき:
-```
-/next p:customer-portal
-```
+→ `Decisions/` にファイルが作られたら成功です。
 
 ---
 
-### シナリオ 6: 技術選定を記録する → 意思決定ログ
+## フォルダの詳細ルール
 
-「なぜその技術を選んだか」を後から振り返れるように記録します。
-Decisions は不変（immutable）。覆す場合は新しい Decision を作ります。
+### AI のアクセス権限
 
-```
-/decide 画像ストレージはS3+CloudFrontを使用 why:コスト効率とCDNの低レイテンシ follow:CloudFrontディストリビューションを作成
-```
+| レベル | フォルダ | できること |
+|--------|---------|-----------|
+| 読み書き可 | `Inbox/`, `Projects/`, `Scratch/`, `Decisions/`, `Knowledge/`, `SOP/`, `Prompts/` | AI がファイルを作成・編集できる |
+| 読み取り専用 | `Archive/`, `AI-readable/` | AI が読むことはできるが、書き込みはできない |
+| **アクセス禁止** | `Private/`, `AI-blocked/` | AI は一切アクセスできない（フックで強制ブロック） |
 
-生成されるファイル: `Decisions/2026/2026-03-15--s3-cloudfront-storage.md`
+### ファイル名のルール
 
-半年後に「なんで S3 にしたんだっけ？」と聞かれても答えられます。
+| 種類 | ルール | 例 |
+|------|--------|------|
+| 日次ファイル | `年-月-日.md` | `2026-03-15.md` |
+| 設計書や決定事項 | `年-月-日--内容の要約.md` | `2026-03-15--adopt-nextjs.md` |
+| フォルダ名 | 小文字のハイフン区切り | `homepage-renewal` |
 
-決定を覆す例:
-```
-/decide 画像ストレージをCloudflare R2に移行 why:S3のエグレス費用が想定以上 follow:R2バケット作成と移行スクリプト
-```
-→ 新しい Decision ファイルが作成され、前の決定と時系列で追える
+### 運用の 7 つの原則
 
----
-
-### シナリオ 7: コミット前に品質チェック
-
-実装が終わったら、コミットする前に diff をレビュー。
-セキュリティ問題やバグを自動検出します。
-
-```
-/review-diff
-```
-
-出力例:
-```
-== review-diff ==
-判定: NOGO
-
-### チェック結果
-- [PASS] セキュリティ: ハードコードされたシークレットなし
-- [PASS] エラーハンドリング: 適切に処理されている
-- [FAIL] 型安全性: any が2箇所で使用 (upload.ts:15, 42)
-
-### 推奨アクション
-1. upload.ts:15 の any を具体的な型に置換
-2. upload.ts:42 の any を File | null に変更
-```
-
-Spec と照合してチェックすることもできる:
-```
-/review-diff spec:Projects/customer-portal/Specs/2026-03-15--profile-image-upload.md focus:security
-```
-→ Spec の受入条件を1つずつチェックし、PASS / WARN / FAIL を判定
+1. **追記主義** — ファイルの中身を上書きしない。新しい情報は追記する
+2. **1 トピック 1 ファイル** — 1 つのファイルには 1 つのトピックだけ書く
+3. **テンプレートを使う** — `_template.md` がある場合はそれに従う
+4. **まず Inbox へ** — すべての思いつきは、まず `/inbox` で記録
+5. **週次の振り返り** — 毎週 `/weekly` で1週間を振り返る
+6. **設計書を先に** — 大きな変更は `/spec` で仕様を書いてから実装
+7. **コミット前チェック** — コードを保存する前に `/review-diff` で確認
 
 ---
 
-### シナリオ 8: 作業を中断する → 引き継ぎメモ
+## セキュリティについて
 
-急な割り込みや退勤時に、現在の状況を記録。
-次回（明日の自分、または別のセッション）がスムーズに再開できます。
+### 安全装置の仕組み
+
+YourOS には、AI が機密情報にアクセスすることを防ぐ安全装置が組み込まれています。
 
 ```
-/handoff アップロードAPIのエラーハンドリングを実装中
+あなたが Claude Code でファイルを書こうとする
+  ↓
+安全装置（block-ai-write.sh）が自動チェック
+  ↓
+書き込み先が Private/ や AI-blocked/ の場合 → ブロック（書き込み拒否）
+書き込み先がそれ以外の場合 → 許可（通常通り書き込み）
 ```
 
-生成されるファイル: `Scratch/Handoffs/2026-03-15--upload-api-error-handling.md`
+### 機密情報の保管場所
 
-```markdown
-# Handoff - 2026-03-15
+| 保管場所 | 入れるもの | AI アクセス | Git 管理 |
+|---------|-----------|------------|---------|
+| `Private/` | 個人情報、財務情報 | 不可 | 対象外 |
+| `AI-blocked/` | API キー、契約書、顧客データ | 不可 | 対象外 |
 
-## Where I Stopped（中断箇所）
-アップロードAPIのエラーハンドリングを実装中
-
-## What's Next（次にやること）
-- [ ] （次回セッションで記入）
-
-## Open Questions（未解決の問題）
-- （なし）
-
-## Key Files（関連ファイル）
-- （次回セッションで記入）
-```
-
-次のセッション開始時に `/next` と合わせて見ると、すぐに状況把握できます。
+どちらのフォルダも `.gitignore` で Git 管理から除外されているので、
+誤って GitHub にアップロードされることもありません。
 
 ---
 
-### シナリオ 9: 週末に振り返る
+## カスタマイズ
 
-金曜日の終わりに、今週やったことを自動集計。
-完了タスク、進行中の作業、学びをまとめます。
+### 新しいプロジェクトを作る
 
+方法1: コマンドで自動作成
 ```
-/weekly
-```
-
-生成されるファイル: `Archive/Reviews/2026-W11.md`
-
-```markdown
-# Weekly Review - 2026-W11
-期間: 2026-03-10 (月) 〜 2026-03-16 (日)
-
-## Completed（完了したこと）
-- [done] S3バケットとIAMポリシーの設定 (p:customer-portal) — 03-16
-- [done] アップロードAPIの実装 (p:customer-portal) — 03-17
-
-## In Progress（進行中）
-- [active] フロントエンドUIの実装 (p:customer-portal) — 通常
-
-## Decisions Made（今週の意思決定）
-- 画像ストレージはS3+CloudFrontを使用 — 2026-03-15
-
-## Improve（改善したいこと）
-- Inbox に3件が未トリアージのまま残っている
+/spec p:新しいプロジェクト名 最初の設計書の説明
 ```
 
----
-
-### シナリオ 10: 自分のプロンプトの癖を分析する
-
-過去の AI 対話ログを分析し、プロンプティングの改善点を見つけます。
-
-```
-/prompt-review 30
-```
-
-過去30日分の Claude Code / GitHub Copilot / Cline 等のログを収集し分析。
-レポートは `Scratch/Reviews/prompt-review-2026-03-15.md` に出力されます。
-
-分析内容:
-- 技術理解度マップ（熟知 / 基本理解 / 学習中）
-- プロンプティングパターン（効果的なパターン / 改善可能なパターン）
-- AI 依存度（主体的に方針を決めているか、AI に丸投げしているか）
-- 成長の軌跡（時系列でのプロンプト品質の変化）
-
----
-
-### 日常の流れまとめ
-
-```
-朝:   /next            → 今日やることを確認
-作業中: /inbox 思いついたこと → 割り込みアイデアをキャプチャ
-設計:  /spec p:xxx 説明    → 実装前に仕様化
-実装:  /task p:xxx タスク   → タスクを切って進める
-決定:  /decide 方針 why:理由 → 技術選定を記録
-検証:  /review-diff        → コミット前チェック
-退勤:  /handoff 状況       → 引き継ぎメモ
-金曜:  /weekly             → 週次振り返り
-月末:  /prompt-review 30   → プロンプト品質の分析
-```
-
-## Workflow（運用フロー）
-
-### 日常サイクル
-
-```
-1. 思いつき → /inbox で即キャプチャ
-2. 整理      → /triage today で Inbox を仕分け
-3. 確認      → /next で今日の優先タスクを表示
-4. 設計      → /spec で仕様化
-5. 実装      → /task でタスク管理しながら開発
-6. 検証      → /review-diff でコミット前チェック
-7. 記録      → /decide で意思決定を記録
-8. 中断      → /handoff で引き継ぎメモ
-```
-
-### 週次サイクル
-
-```
-1. /weekly         → 週次レビュー生成（Archive/Reviews/ に保存）
-2. /prompt-review  → プロンプト運用の振り返り（Scratch/Reviews/ に保存）
-3. /triage all     → 未処理 Inbox の一掃
-```
-
-## Folder Rules（フォルダルール）
-
-### AI アクセス制御
-
-| レベル | フォルダ | 権限 |
-|--------|---------|------|
-| Read/Write | `Inbox/`, `Projects/*/Tasks/`, `Scratch/`, `Decisions/`, `Knowledge/`, `SOP/` | 読み書き可 |
-| Read-only | `Archive/`, `AI-readable/` | 読み取りのみ |
-| **BLOCKED** | `Private/`, `AI-blocked/` | 一切アクセス不可（フックで強制） |
-
-### 命名規則
-
-| 種類 | 形式 | 例 |
-|------|------|------|
-| 日次ファイル | `YYYY-MM-DD.md` | `2026-03-15.md` |
-| Decision / Spec | `YYYY-MM-DD--slug.md` | `2026-03-15--auth-rate-limit.md` |
-| フォルダ | `kebab-case` | `customer-portal` |
-| slug | `kebab-case`（英語） | `login-error-fix` |
-
-### YAML Frontmatter（共通メタデータ）
-
-すべてのファイルに付与:
-
-```yaml
----
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-type: inbox|spec|task|decision|sop|knowledge|handoff|review
-project: project-name
-status: draft|active|done|archived
-tags: [p:xxx, a:xxx, t:xxx]
----
-```
-
-### タグ体系
-
-| Prefix | 用途 | 例 |
-|--------|------|------|
-| `p:` | プロジェクト | `p:alpha` |
-| `a:` | エリア | `a:dev`, `a:biz` |
-| `t:` | タイプ | `t:decision`, `t:sop` |
-| `s:` | ステータス | `s:active`, `s:done` |
-| `risk:` | リスクレベル | `risk:high` |
-
-## Operating Principles（運用原則）
-
-1. **追記主義** — 上書きしない。変更は `HH:MM` タイムスタンプ付きで追記。Decisions は不変（immutable）
-2. **1 トピック 1 ファイル** — 1 つのファイルに 1 つのトピック
-3. **テンプレ使用** — `_template.md` があればそれに従う
-4. **Inbox 入口** — すべての思いつきはまず `/inbox` で Inbox へ
-5. **週次整理** — 毎週 `/weekly` でレビュー
-6. **Spec 先行** — diff が一文で言えない変更は `/spec` で仕様化してから実装
-7. **Quality Gate** — コミット前に `/review-diff` で GO/NOGO 確認
-
-## Security（セキュリティ）
-
-### PreToolUse フック
-
-`SOP/security/block-ai-write.sh` は Claude Code の PreToolUse フックとして動作します。
-Write / Edit ツールが `AI-blocked/` または `Private/` を対象とする場合に自動でブロックします。
-
-**仕組み**:
-
-```
-Claude Code が Write/Edit を実行
-  → block-ai-write.sh にパスが渡される
-  → AI-blocked/ or Private/ を含む → deny（ブロック）
-  → それ以外 → allow（許可）
-```
-
-### .gitignore
-
-`Private/` と `AI-blocked/` は `.gitignore` で Git 管理から除外されています。
-機密データが誤ってコミットされることを防ぎます。
-
-### 注意事項
-
-- フックはデフォルトで「fail-open」（スクリプトエラー時は許可）です
-- 厳密な環境では `block-ai-write.sh` の最終行を `exit 2` に変更して「fail-closed」にすることを推奨
-- `~/.claude/settings.json` には API キーなどのクレデンシャルが含まれる場合があります。Git にコミットしないでください
-
-## Architecture（アーキテクチャ）
-
-```
-┌─────────────────────────────────────────┐
-│  User                                   │
-│  └─ /inbox, /spec, /task, /next ...     │
-├─────────────────────────────────────────┤
-│  Claude Code (PM)                       │
-│  └─ Skills (~/.claude/skills/*)         │
-│     └─ SKILL.md × 10 commands           │
-├─────────────────────────────────────────┤
-│  YourOS (~/YourOS/)                     │
-│  ├─ CLAUDE.md (AI ルール定義)            │
-│  ├─ .company/ (cc-company 組織構造)      │
-│  └─ 11 Top-level Directories           │
-├─────────────────────────────────────────┤
-│  Security Layer                         │
-│  └─ PreToolUse Hook (block-ai-write.sh) │
-│     └─ Private/, AI-blocked/ を保護      │
-└─────────────────────────────────────────┘
-```
-
-## Customization（カスタマイズ）
-
-### プロジェクトの追加
-
+方法2: 手動で作成
 ```bash
 mkdir -p ~/YourOS/Projects/my-project/{Context,Specs,Tasks,Notes,Links}
 ```
 
-または `/spec p:my-project 説明` を実行すると自動でフォルダが作成されます。
+### コマンドの動作を変える
 
-### スキルの編集
+各コマンドの動作は `~/.claude/skills/<コマンド名>/SKILL.md` に書かれています。
+このファイルを編集すると、コマンドの動作をカスタマイズできます。
 
-各スキルの動作は `~/.claude/skills/<name>/SKILL.md` を編集することで変更できます。
+### 新しいコマンドを追加する
 
-主な設定項目:
+1. `~/.claude/skills/新コマンド名/SKILL.md` を作成
+2. 処理内容を Markdown で記述
+3. Claude Code を再起動すると、新しいコマンドが使えるようになる
 
-```yaml
 ---
-name: skill-name
-description: スキルの説明
-disable-model-invocation: true   # AI の自動判断での実行を無効化
-allowed-tools: Read, Write, Bash  # 使用可能なツール
-context: fork                     # 隔離コンテキストで実行
+
+## アーキテクチャ（全体の仕組み）
+
+```
+┌─────────────────────────────────────────────┐
+│  あなた（ユーザー）                            │
+│  └─ /inbox, /spec, /task, /next ...          │
+│     チャット画面でコマンドを入力                 │
+├─────────────────────────────────────────────┤
+│  Claude Code（AI アシスタント）                │
+│  └─ Skills（コマンド定義ファイル）              │
+│     └─ ~/.claude/skills/ に10個の SKILL.md    │
+├─────────────────────────────────────────────┤
+│  YourOS（ファイル整理棚）                      │
+│  └─ ~/YourOS/                               │
+│     ├─ CLAUDE.md（AI のルールブック）           │
+│     ├─ .company/（仮想会社の組織構造）          │
+│     └─ 11 個のフォルダ                        │
+├─────────────────────────────────────────────┤
+│  セキュリティ層                               │
+│  └─ block-ai-write.sh（安全装置）             │
+│     └─ Private/ と AI-blocked/ を保護         │
+└─────────────────────────────────────────────┘
+```
+
 ---
-```
 
-### 新しいスキルの追加
+## 関連リンク
 
-1. `~/.claude/skills/my-skill/SKILL.md` を作成
-2. フロントマターに `name`, `description`, `allowed-tools` を定義
-3. 処理フローを Markdown で記述
-4. 新しい Claude Code セッションを開始するとスキルが認識される
+- [設計ドキュメント（DeepResearch）](https://github.com/masaki-sigoto/prompt-review_cc-company) — YourOS の設計思想
+- [Claude Code Skills 公式ドキュメント](https://docs.anthropic.com/en/docs/claude-code/skills) — スキルの仕様
+- [cc-company](https://www.npmjs.com/package/cc-company) — 仮想会社プラグイン
 
-## Verification（動作確認）
-
-セットアップ後の検証コマンド:
-
-```
-/inbox テスト: セットアップ確認          → Inbox/YYYY/YYYY-MM-DD.md に記録される
-/triage today                          → Inbox の仕分け提案が表示される
-/next                                  → 未完了タスクの Top 3 が表示される
-/decide テスト環境構築完了 why:動作確認   → Decisions/YYYY/ にファイルが作成される
-/handoff セットアップ完了               → Scratch/Handoffs/ にファイルが作成される
-```
-
-詳細なチェックリストは [SOP/ops/os-verification.md](SOP/ops/os-verification.md) を参照。
-
-## Related
-
-- [prompt-review_cc-company](https://github.com/masaki-sigoto/prompt-review_cc-company) — YourOS の設計ドキュメント（DeepResearch）
-- [Claude Code Skills](https://docs.anthropic.com/en/docs/claude-code/skills) — Skills の仕様
-- [cc-company](https://www.npmjs.com/package/cc-company) — Claude Code 仮想会社プラグイン
-
-## License
+## ライセンス
 
 MIT
